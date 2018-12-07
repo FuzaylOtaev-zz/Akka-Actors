@@ -74,6 +74,16 @@ public class Device extends AbstractActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
+                .match(DeviceManager.RequestTrackDevice.class, r -> {
+                    if (this.groupId.equals(r.groupId) && this.deviceId.equals(r.deviceId)) {
+                        getSender().tell(new DeviceManager.DeviceRegistered(), getSelf());
+                    } else {
+                        log.warning(
+                                "Ignoring TrackDevice request for {}-{}.This actor is responsible for {}-{}.",
+                                r.groupId, r.deviceId, this.groupId, this.deviceId
+                        );
+                    }
+                })
                 .match(RecordTemperature.class, r -> {
                     log.info("Record temperature reading {} with {}", r.value, r.requestId);
                     lastTemperatureReading = Optional.of(r.value);
