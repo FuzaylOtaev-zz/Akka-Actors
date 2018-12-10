@@ -155,8 +155,29 @@ public class DeviceTest {
             return null;
 
         });
-        
+    }
+
+    @Test
+    public void runDeviceManagerActor() {
+        TestKit probe = new TestKit(system);
+        ActorRef deviceManager = system.actorOf(DeviceManager.props(), "device-manager");
+
+        deviceManager.tell(new DeviceManager.RequestTrackDevice("group1", "group1-device1"), probe.getRef());
+        probe.expectMsgClass(DeviceManager.DeviceRegistered.class);
+
+        deviceManager.tell(new DeviceManager.RequestTrackDevice("group1", "group1-device2"), probe.getRef());
+        probe.expectMsgClass(DeviceManager.DeviceRegistered.class);
+
+        deviceManager.tell(new DeviceManager.RequestTrackDevice("group2", "group2-device1"), probe.getRef());
+        probe.expectMsgClass(DeviceManager.DeviceRegistered.class);
+
+        deviceManager.tell(new DeviceManager.RequestTrackDevice("group2", "group2-device2"), probe.getRef());
+        probe.expectMsgClass(DeviceManager.DeviceRegistered.class);
 
 
+        ActorRef toShutDown = probe.getLastSender();
+        probe.watch(toShutDown);
+        toShutDown.tell(PoisonPill.getInstance(), ActorRef.noSender());
+        probe.expectTerminated(toShutDown);
     }
 }
