@@ -1,0 +1,8 @@
+An Inbox is an actor-like object which is interrogated from the outside.
+It contains an actor whose reference can be passed to other actors as
+usual and it can watch other actors’ lifecycle.
+
+When writing code outside of actors which shall communicate with actors, the ask pattern can be a solution,
+but there are two things it cannot do: receiving multiple replies
+and watching other actors’ lifecycle.
+
